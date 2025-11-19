@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <h1 class="h4 mb-3">Painel Demonstrativo – Binance Testnet</h1>
+          <p class="text-muted">
+            Este painel está conectado à <strong>Binance Spot Testnet</strong>.
+            Aqui exibimos os saldos da conta de teste e, em outras telas, ordens e indicadores.
+          </p>
+
+          <p class="mb-3">
+            Abaixo você vê os saldos da sua conta de teste.
+            Se quiser ver um exemplo de mercado com indicadores técnicos
+            (SMA, RSI, MACD), use as opções abaixo:
+          </p>
+
+          <!-- Atalho direto para BTCUSDT -->
+          <a href="{{ url_for('market', symbol='BTCUSDT') }}"
+             class="btn btn-primary btn-sm me-2 mb-2">
+            Ver BTCUSDT com indicadores
+          </a>
+
+          <!-- Seletor de outros pares -->
+          <form class="row g-2 align-items-center mt-2"
+                method="get"
+                action="{{ url_for('market_select') }}">
+            <div class="col-auto">
+              <label for="symbol" class="col-form-label">Ou escolha outro par:</label>
+            </div>
+            <div class="col-auto">
+              <select id="symbol" name="symbol" class="form-select form-select-sm">
+                <option value="BTCUSDT">BTCUSDT</option>
+                <option value="ETHUSDT">ETHUSDT</option>
+                <option value="BNBUSDT">BNBUSDT</option>
+                <option value="LTCUSDT">LTCUSDT</option>
+                <option value="XRPUSDT">XRPUSDT</option>
+              </select>
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-outline-primary btn-sm">
+                Abrir mercado
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {% if error_message %}
+        <div class="alert alert-danger">
+          {{ error_message }}
+        </div>
+      {% endif %}
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Saldos na Testnet</h2>
+
+          {% if balances and balances|length > 0 %}
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th>Ativo</th>
+                    <th>Disponível (free)</th>
+                    <th>Em ordem (locked)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for b in balances %}
+                    <tr>
+                      <td>{{ b.asset }}</td>
+                      <td>{{ "%.8f"|format(b.free) }}</td>
+                      <td>{{ "%.8f"|format(b.locked) }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted mb-0">
+              Nenhum saldo com valor maior que zero encontrado na conta de teste.
+              Se for sua primeira vez, vá na <strong>Spot Testnet</strong> e adicione
+              fundos de teste (faucet / créditos) para ver algo aqui.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

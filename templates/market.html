@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="card shadow-sm mb-3">
+        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+          <div>
+            <h1 class="h4 mb-1">Mercado – {{ symbol }}</h1>
+            <p class="text-muted mb-0">
+              Dados da <strong>Binance Spot Testnet</strong> com indicadores calculados no servidor
+              (SMA 9, SMA 21, RSI 14, MACD).
+            </p>
+          </div>
+          <div class="mt-3 mt-md-0">
+            <span class="badge bg-info text-dark me-2">Ambiente de teste</span>
+            <span class="badge bg-warning text-dark">Ordem de demonstração</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bloco de envio de ordens de teste -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Enviar ordem de teste (Market)</h2>
+          <p class="text-muted">
+            Estas ordens são enviadas apenas na <strong>testnet</strong>, sem risco financeiro.
+            Ideal para demonstrar para o cliente o fluxo de ordens automáticas.
+          </p>
+
+          <form class="row g-2 align-items-center" method="post"
+                action="{{ url_for('order', symbol=symbol, side='BUY') }}">
+            <div class="col-auto">
+              <label for="quantity" class="col-form-label">Quantidade ({{ symbol[:-4] }})</label>
+            </div>
+            <div class="col-auto">
+              <input
+                type="number"
+                step="0.000001"
+                min="0.000001"
+                name="quantity"
+                id="quantity"
+                value="{{ default_qty }}"
+                class="form-control form-control-sm"
+                required
+              >
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-success btn-sm">
+                Comprar (BUY)
+              </button>
+            </div>
+            <div class="col-auto">
+              <button
+                type="submit"
+                formaction="{{ url_for('order', symbol=symbol, side='SELL') }}"
+                class="btn btn-danger btn-sm"
+              >
+                Vender (SELL)
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {% if error_message %}
+        <div class="alert alert-danger">
+          {{ error_message }}
+        </div>
+      {% endif %}
+
+      <!-- Tabela de candles + indicadores -->
+      {% if rows %}
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h5 mb-3">Últimos candles e indicadores</h2>
+            <div class="table-responsive">
+              <table class="table table-sm table-striped align-middle">
+                <thead>
+                  <tr>
+                    <th>Data/Hora (abertura)</th>
+                    <th>Fechamento</th>
+                    <th>SMA 9</th>
+                    <th>SMA 21</th>
+                    <th>RSI 14</th>
+                    <th>MACD</th>
+                    <th>Sinal MACD</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in rows %}
+                    <tr>
+                      <td>{{ row.open_time }}</td>
+                      <td>{{ row.close }}</td>
+                      <td>{{ row.sma_fast }}</td>
+                      <td>{{ row.sma_slow }}</td>
+                      <td>{{ row.rsi }}</td>
+                      <td>{{ row.macd }}</td>
+                      <td>{{ row.macd_signal }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <p class="text-muted">
+          Nenhum dado disponível para este par.
+        </p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
